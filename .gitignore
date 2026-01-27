@@ -1,0 +1,36 @@
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Editor settings
+.idea/
+.vscode/
+
+# Node.js
+node_modules/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# Python
+.venv/
+env/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+
+# PHP / Composer
+vendor/
+composer.lock
+
+# Test & coverage output
+coverage/
+
+# Environment / secrets
+.env
+*.env
+

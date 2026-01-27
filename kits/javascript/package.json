@@ -1,0 +1,19 @@
+{
+  "name": "conduitex-sdk-js",
+  "version": "0.1.0",
+  "description": "Official Conduitex JavaScript SDK",
+  "type": "module",
+  "main": "src/client.js",
+  "exports": "./src/client.js",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "axios": "^1.6.7"
+  },
+  "devDependencies": {
+    "nock": "^13.5.0",
+    "vitest": "^1.2.0",
+    "dotenv": "^16.4.5"
+  }
+}

@@ -1,0 +1,11 @@
+# Dependencies
+vendor/
+
+# Composer artifacts
+composer.lock
+
+# Tests / cache
+.phpunit.result.cache
+
+# OS / tooling
+.DS_Store

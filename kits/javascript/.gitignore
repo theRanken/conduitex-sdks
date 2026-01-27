@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Tests / coverage
+coverage/
+
+# Tooling
+.DS_Store
+.vite/
+.turbo/
