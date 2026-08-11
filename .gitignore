@@ -34,3 +34,7 @@ coverage/
 .env
 *.env
 
+/.claude
+/.repowise
+.mcp.json
+
