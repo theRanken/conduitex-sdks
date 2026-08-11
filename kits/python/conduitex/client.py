@@ -10,7 +10,7 @@ from .response import ConduitexResponse
 
 
 class ConduitexClient:
-    """Client for interacting with the Conduitex proxy API."""
+    """Client for interacting with the Conduitex gateway runtime proxy API."""
 
     def __init__(
         self,
@@ -21,7 +21,7 @@ class ConduitexClient:
         base_url: Optional[str] = None,
     ) -> None:
         if base_url:
-            raise ValueError("Base URL is centrally managed. Use CONDUITEX_BASE_URL.")
+            raise ValueError("Base URL must be configured via CONDUITEX_BASE_URL.")
 
         resolved_base = (
             os.environ.get("CONDUITEX_BASE_URL")

@@ -1,11 +1,17 @@
 # Conduitex SDKs
 
-Multi-language SDKs for the Conduitex platform. Kits live in `kits/javascript`, `kits/python`, and `kits/php`.
+Multi-language gateway runtime SDKs for the Conduitex platform. Kits live in `kits/javascript`, `kits/python`, and `kits/php`.
 
-## Base URL (centralized)
-- All SDKs read `CONDUITEX_BASE_URL` (defaults to `https://api.conduitex.com`).
+## Base URL
+- All SDKs read `CONDUITEX_BASE_URL`.
+- Point `CONDUITEX_BASE_URL` at your deployed gateway, for example `https://gateway.example.com`.
+- The legacy fallback default remains `https://api.conduitex.com`, but gateway deployments should override it explicitly.
 - Optional helper for local runs: copy `.env.example` to `.env` and set `CONDUITEX_BASE_URL` and `CONDUITEX_VAULT_KEY`.
-- Each client still accepts an explicit `baseUrl`/`base_url` parameter if you want to override per instance.
+
+## Scope
+- These SDKs are for customer-to-gateway runtime traffic only.
+- They wrap vault-key-authenticated proxy calls under `/api/v1/proxy/...`.
+- They do not expose gateway registration, bootstrap, sync, billing, org management, or other hosted control-plane flows.
 
 ## Local setup
 - Node (v22): `cd kits/javascript && npm install --no-package-lock`
@@ -35,4 +41,5 @@ Multi-language SDKs for the Conduitex platform. Kits live in `kits/javascript`, 
 
 ## Notes for contributors
 - Shared ignores in `.gitignore` prevent committing build artifacts, virtualenvs, vendors, and environment files.
-- Base URL defaults are safe for production; override per environment via `CONDUITEX_BASE_URL`.
+- Keep the public SDK surface runtime-only; gateway control-plane plumbing belongs inside the gateway application.
+- Configure runtime targets per environment via `CONDUITEX_BASE_URL`.

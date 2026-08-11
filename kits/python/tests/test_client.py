@@ -14,6 +14,7 @@ load_dotenv()
 BASE_URL = os.getenv("CONDUITEX_BASE_URL", "https://api.test")
 DEFAULT_BASE_URL = "https://api.conduitex.com"
 LIVE = os.getenv("CONDUITEX_LIVE_TESTS") == "1"
+GATEWAY_BASE_URL = "https://gateway.internal"
 
 
 def test_get_with_params_and_default_headers(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -161,5 +162,24 @@ def test_env_base_url_is_used_when_missing_argument(monkeypatch: pytest.MonkeyPa
 def test_rejects_explicit_base_url(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("CONDUITEX_BASE_URL", raising=False)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="CONDUITEX_BASE_URL"):
         ConduitexClient(vault_key="vk_test", base_url="https://override.test")
+
+
+def test_uses_configured_gateway_base_url(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("CONDUITEX_BASE_URL", GATEWAY_BASE_URL)
+
+    client = ConduitexClient(vault_key="vk_test")
+
+    with responses.RequestsMock() as rsps:
+        rsps.add(
+            responses.GET,
+            f"{GATEWAY_BASE_URL}/api/v1/proxy/github/repos",
+            json={"ok": True},
+            status=200,
+        )
+
+        response = client.get("github", "repos")
+
+        assert response.status_code == 200
+        assert rsps.calls[0].request.url == f"{GATEWAY_BASE_URL}/api/v1/proxy/github/repos"

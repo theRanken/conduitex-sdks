@@ -11,6 +11,7 @@ const BASE_URL = process.env.CONDUITEX_BASE_URL;
 const LIVE = process.env.CONDUITEX_LIVE_TESTS === "1";
 const LIVE_TIMEOUT = LIVE ? 15000 : 5000;
 const ORIGINAL_ENV_BASE = process.env.CONDUITEX_BASE_URL;
+const GATEWAY_BASE_URL = "https://gateway.internal";
 
 beforeAll(() => {
   if (!LIVE) {
@@ -138,6 +139,21 @@ describe("ConduitexClient", () => {
   it("rejects explicit baseUrl overrides", () => {
     expect(() => {
       new ConduitexClient({ baseUrl: "https://evil.test", vaultKey: "vk_test" });
-    }).toThrow(/centrally managed/i);
+    }).toThrow(/CONDUITEX_BASE_URL/i);
+  });
+
+  it("uses the configured gateway base URL for runtime traffic", async () => {
+    process.env.CONDUITEX_BASE_URL = GATEWAY_BASE_URL;
+
+    const client = new ConduitexClient({ vaultKey: "vk_test" });
+
+    const scope = nock(GATEWAY_BASE_URL)
+      .get("/api/v1/proxy/github/repos")
+      .reply(200, { ok: true });
+
+    const response = await client.get("github", "repos");
+
+    expect(response.status).toBe(200);
+    expect(scope.isDone()).toBe(true);
   });
 });

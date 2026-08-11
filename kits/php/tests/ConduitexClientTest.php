@@ -9,12 +9,16 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 
 it('sends vault key header and query parameters', function (): void {
+    $live = conduitexLive();
+    if (! $live) {
+        putenv('CONDUITEX_BASE_URL=https://api.test');
+    }
 
     $client = new ConduitexClient(
         vaultKey: 'vk_test',
     );
 
-    if (conduitexLive()) {
+    if ($live) {
         try {
             $response = $client->get('github', 'repos', ['q' => 'laravel']);
             expect($response->status())->toBeGreaterThanOrEqual(200);
@@ -46,6 +50,10 @@ it('sends vault key header and query parameters', function (): void {
         $request = $history[0]['request'];
         expect((string) $request->getUri())->toBe('https://api.test/api/v1/proxy/github/repos?q=laravel');
         expect($request->getHeaderLine('X-Vault-Key'))->toBe('vk_test');
+    }
+
+    if (! $live) {
+        putenv('CONDUITEX_BASE_URL');
     }
 });
 
@@ -168,5 +176,33 @@ it('uses CONDUITEX_BASE_URL when baseUrl is omitted', function (): void {
 
 it('rejects overriding baseUrl via constructor', function (): void {
     expect(fn () => new ConduitexClient(baseUrl: 'https://override.test', vaultKey: 'vk_test'))
-        ->toThrow(Error::class);
+        ->toThrow(\Conduitex\Sdk\Exceptions\ConduitexException::class, 'CONDUITEX_BASE_URL');
+});
+
+it('uses the configured gateway base URL for runtime traffic', function (): void {
+    putenv('CONDUITEX_BASE_URL=https://gateway.internal');
+
+    $history = [];
+    $mock = new MockHandler([
+        new Response(
+            200,
+            ['Content-Type' => 'application/json'],
+            json_encode(['ok' => true], JSON_THROW_ON_ERROR),
+        ),
+    ]);
+
+    $stack = HandlerStack::create($mock);
+    $stack->push(Middleware::history($history));
+
+    $client = new ConduitexClient(
+        vaultKey: 'vk_test',
+        httpClient: new Client(['handler' => $stack]),
+    );
+
+    $client->get('github', 'repos');
+    $request = $history[0]['request'] ?? null;
+
+    expect((string) $request?->getUri())->toBe('https://gateway.internal/api/v1/proxy/github/repos');
+
+    putenv('CONDUITEX_BASE_URL');
 });

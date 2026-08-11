@@ -20,8 +20,13 @@ class ConduitexClient
         private readonly string $vaultKey,
         private readonly string $apiVersion = 'v1',
         private readonly float $timeout = 30.0,
+        ?string $baseUrl = null,
         ?ClientInterface $httpClient = null,
     ) {
+        if ($baseUrl !== null && trim($baseUrl) !== '') {
+            throw new ConduitexException('Base URL must be configured via CONDUITEX_BASE_URL.');
+        }
+
         $this->baseUrl = $this->resolveBaseUrl();
 
         if (trim($vaultKey) === '') {

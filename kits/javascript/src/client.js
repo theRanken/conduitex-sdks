@@ -32,7 +32,7 @@ export class ConduitexResponse {
 export class ConduitexClient {
   constructor({ baseUrl, vaultKey, apiVersion = DEFAULT_API_VERSION, timeout = 30000 } = {}) {
     if (baseUrl) {
-      throw new ConduitexError("Base URL is centrally managed. Use CONDUITEX_BASE_URL.");
+      throw new ConduitexError("Base URL must be configured via CONDUITEX_BASE_URL.");
     }
 
     const resolvedBaseUrl = resolveBaseUrl();
